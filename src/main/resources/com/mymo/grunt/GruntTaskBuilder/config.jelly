@@ -3,4 +3,32 @@
   <f:entry title="Task" field="task">
     <f:textbox />
   </f:entry>
+  <f:advanced>
+    <f:section title="Task configuration">
+      <f:entry title="Base" field="base">
+        <f:textbox />
+      </f:entry>
+      <f:entry title="Gruntfile" field="gruntFile">
+        <f:textbox />
+      </f:entry>
+      <f:entry title="Properties" field="properties">
+        <f:textarea />
+      </f:entry>
+      <f:entry title="Debug" field="debug">
+        <div>
+          <f:checkbox />
+        </div>
+      </f:entry>
+      <f:entry title="Force" field="force">
+        <div>
+          <f:checkbox />
+        </div>
+      </f:entry>
+      <f:entry title="Verbose" field="verbose">
+        <div>
+          <f:checkbox />
+        </div>
+      </f:entry>
+    </f:section>
+  </f:advanced>
 </j:jelly>
