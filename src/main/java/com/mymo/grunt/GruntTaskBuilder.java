@@ -14,33 +14,15 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.IOException;
 
 public class GruntTaskBuilder extends Builder {
-    private static final int SUCCESS            = 0;
-
-    private static final String DEBUG_FLAG      = "debug";
-    private static final String FORCE_FLAG      = "force";
-    private static final String BASE_FLAG       = "flag";
-    private static final String VERBOSE_FLAG    = "verbose";
-    private static final String GRUNTFILE_FLAG  = "gruntfile";
+    private static final int SUCCESS = 0;
 
     private final String task;
-    private final String base;
-    private final String gruntFile;
-    private final String properties;
-
-    private final boolean debug;
-    private final boolean force;
-    private final boolean verbose;
+    private final boolean sudo;
 
     @DataBoundConstructor
-    public GruntTaskBuilder(String task, String base, String gruntFile, String properties,
-                            boolean debug, boolean force, boolean verbose) {
+    public GruntTaskBuilder(String task, boolean sudo) {
         this.task       = task;
-        this.base       = base;
-        this.gruntFile  = gruntFile;
-        this.properties = properties;
-        this.debug      = debug;
-        this.force      = force;
-        this.verbose    = verbose;
+        this.sudo       = sudo;
     }
 
     @Override
@@ -48,7 +30,7 @@ public class GruntTaskBuilder extends Builder {
         try {
 
             int result = launcher.launch()
-                    .cmdAsSingleString(getCommand())
+                    .cmdAsSingleString(buildCommand())
                     .stderr(listener.getLogger())
                     .stdout(listener.getLogger())
                     .pwd(build.getWorkspace())
@@ -63,71 +45,24 @@ public class GruntTaskBuilder extends Builder {
         return false;
     }
 
-    private String getCommand() {
-        StringBuilder stringBuilder = new StringBuilder(String.format("%s %s", getDescriptor().getGruntHome(), task));
+    private String buildCommand() {
+        StringBuilder stringBuilder;
 
-        if (base != null && !base.isEmpty()) {
-            appendFlag(stringBuilder, BASE_FLAG, base);
-        }
-
-        if (gruntFile != null && !gruntFile.isEmpty()) {
-            appendFlag(stringBuilder, GRUNTFILE_FLAG, gruntFile);
-        }
-
-        if (properties != null && !properties.isEmpty()) {
-            for (String propArg : properties.split("\n")) {
-                appendFlag(stringBuilder, propArg);
-            }
-        }
-
-        if (debug) {
-            appendFlag(stringBuilder, DEBUG_FLAG);
-        }
-
-        if (force) {
-            appendFlag(stringBuilder, FORCE_FLAG);
-        }
-
-        if (verbose) {
-            appendFlag(stringBuilder, VERBOSE_FLAG);
+        if (isSudo()) {
+            stringBuilder = new StringBuilder(String.format("sudo %s %s", getDescriptor().getGruntHome(), getTask()));
+        } else {
+            stringBuilder = new StringBuilder(String.format("%s %s", getDescriptor().getGruntHome(), getTask()));
         }
 
         return stringBuilder.toString();
-    }
-
-    private static void appendFlag(final StringBuilder builder, final String flag, final String... opts) {
-        builder.append(String.format(" --%s", flag));
-        if (opts != null && opts.length > 0) {
-            builder.append(String.format(" %s", opts));
-        }
     }
 
     public String getTask() {
         return task;
     }
 
-    public String getBase() {
-        return base;
-    }
-
-    public String getGruntFile() {
-        return gruntFile;
-    }
-
-    public String getProperties() {
-        return properties;
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public boolean isForce() {
-        return force;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
+    public boolean isSudo() {
+        return sudo;
     }
 
     @Override
