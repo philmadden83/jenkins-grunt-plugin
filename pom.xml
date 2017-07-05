@@ -18,7 +18,7 @@
     <jenkins.version>1.615</jenkins.version>
   </properties>
 
-  <name>Grutn</name>
+  <name>Grunt</name>
   <description>Executes Grunt tasks</description>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/TODO+Plugin</url>
 
