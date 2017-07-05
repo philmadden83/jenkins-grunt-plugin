@@ -14,6 +14,8 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.IOException;
 
 public class GruntTaskBuilder extends Builder {
+    private static final int SUCCESS            = 0;
+
     private static final String DEBUG_FLAG      = "debug";
     private static final String FORCE_FLAG      = "force";
     private static final String BASE_FLAG       = "flag";
@@ -47,9 +49,12 @@ public class GruntTaskBuilder extends Builder {
 
             int result = launcher.launch()
                     .cmdAsSingleString(getCommand())
+                    .stderr(listener.getLogger())
+                    .stdout(listener.getLogger())
+                    .pwd(build.getWorkspace())
                     .join();
 
-            return result == 0;
+            return result == SUCCESS;
 
         } catch (IOException | InterruptedException e) {
             listener.fatalError(e.getMessage());
